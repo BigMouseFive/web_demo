@@ -1,0 +1,284 @@
+basePath: /api
+definitions:
+  common.RequestUpdate:
+    properties:
+      id:
+        type: string
+      update:
+        additionalProperties: true
+        type: object
+    type: object
+  common.Response:
+    properties:
+      msg:
+        type: string
+      result: {}
+    type: object
+  demo.LoginRequest:
+    properties:
+      account:
+        type: string
+      password:
+        type: string
+    type: object
+  demo.UserModel:
+    properties:
+      auths:
+        items:
+          type: string
+        type: array
+      corporation_id:
+        type: string
+      create_time:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      projects:
+        items:
+          type: string
+        type: array
+      remark: {}
+      role_id:
+        type: string
+      sex:
+        description: 0:未知  1:男  2:女
+        type: integer
+    type: object
+info:
+  contact: {}
+  description: 负责给SaaS平台前端提供数据
+  title: 行云智能SaaS平台接口
+  version: "1.0"
+paths:
+  /demo/login:
+    delete:
+      consumes:
+      - application/json
+      description: 登出
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 登出
+      tags:
+      - 登录/登出
+    post:
+      description: 登录
+      parameters:
+      - description: 登录信息
+        in: body
+        name: user_info
+        required: true
+        schema:
+          $ref: '#/definitions/demo.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 登录
+      tags:
+      - 登录/登出
+  /demo/users:
+    delete:
+      consumes:
+      - application/json
+      description: 删除用户信息
+      parameters:
+      - in: query
+        items:
+          type: string
+        name: id_list
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除用户信息
+      tags:
+      - 用户
+    get:
+      consumes:
+      - application/json
+      description: 获取用户信息
+      parameters:
+      - description: 绑定的客户编号
+        in: query
+        name: corporation_id
+        type: string
+      - description: 根据id获取
+        in: query
+        name: id
+        type: string
+      - in: query
+        name: ignore_role_id
+        type: string
+      - description: 分页：每页显示数量
+        in: query
+        name: limit
+        type: integer
+      - description: 分页：页码
+        in: query
+        name: page
+        type: integer
+      - description: 绑定的角色编号
+        in: query
+        name: role_id
+        type: string
+      - description: 全文检索，针对id和name
+        in: query
+        name: search
+        type: string
+      - description: 性别
+        in: query
+        name: sex
+        type: integer
+      - description: 排序 +key/-key
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                msg:
+                  type: string
+                result:
+                  items:
+                    $ref: '#/definitions/demo.UserModel'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取用户信息
+      tags:
+      - 用户
+    post:
+      consumes:
+      - application/json
+      description: 修改用户信息
+      parameters:
+      - description: 修改用户信息列表
+        in: body
+        name: user_list
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/common.RequestUpdate'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                msg:
+                  type: string
+                result:
+                  items:
+                    type: string
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改用户信息
+      tags:
+      - 用户
+    put:
+      consumes:
+      - application/json
+      description: 增加用户信息
+      parameters:
+      - description: 新增用户信息列表
+        in: body
+        name: user_list
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/demo.UserModel'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                msg:
+                  type: string
+                result:
+                  items:
+                    type: string
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 增加用户信息
+      tags:
+      - 用户
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
